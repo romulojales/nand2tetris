@@ -43,19 +43,11 @@ CHIP ALU {
 
     PARTS:
     
-	Not16(in=x, out=notX);
+	Not16(in=x, out=notX);	
+	Mux4Way16(a=x, b[0..15]=false, c=notX, d[0..15]=true, sel[0]=zx, sel[1]=nx, out=presetedX);
 	
-	And16(a=x, b=notX, out=zeroX);
-	Not16(in=zeroX, out=oneX);
-	
-	Mux4Way16(a=x, b=zeroX, c=notX, d=oneX, sel[0]=zx, sel[1]=nx, out=presetedX);
-	
-	Not16(in=y, out=notY);
-	
-	And16(a=y, b=notY, out=zeroY);
-	Not16(in=zeroY, out=oneY);
-	
-	Mux4Way16(a=y, b=zeroY, c=notY, d=oneY, sel[0]=zy, sel[1]=ny, out=presetedY);
+	Not16(in=y, out=notY);	
+	Mux4Way16(a=y, b[0..15]=false, c=notY, d[0..15]=true, sel[0]=zy, sel[1]=ny, out=presetedY);
    	
 	And16(a=presetedX, b=presetedY, out=xAndY);
 	Add16(a=presetedX, b=presetedY, out=xAddY);
@@ -64,5 +56,15 @@ CHIP ALU {
 	
 	Not16(in=opResult, out=notOpResult);
 	
-	Mux16(a=opResult, b=notOpResult, sel=no, out=out);
+	Mux16(a=opResult, b=notOpResult, sel=no, out=out, out[15]=negSignal, out[0..7]=firstHalf, out[8..15]=secondHalf);
+	
+	//Is output negative?
+	And(a=negSignal, b=true, out=ng);
+	
+	//Is output zero?
+	Or8Way(in=firstHalf, out=isFirstHalfZero);
+	Or8Way(in=secondHalf, out=isSecondHalfZero);
+	Or(a=isFirstHalfZero, b=isSecondHalfZero, out=isZero);
+	Not(in=isZero, out=zr);
+
 }
