@@ -8,20 +8,17 @@
 
 // Put your code here.
 
-
-// Repeat R0 times the operation (R2 = R1 + R2);
   @R2
   M=0
-  @R1
-  A=M
 (LOOP)
-
   @R0
   MD=M-1
   @END
   D;JLT
+  @R1
+  D=M
   @R2
-  M=A+M
+  M=D+M
   @LOOP
   0;JMP
 (END)
